@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evaluación Diagnóstica — EDO · Physics CEC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<style>
+  :root{
+    --bg:#0A1628; --bg-alt:#0F2340; --bg-alt-2:#122A4C;
+    --paper:#F6F1E4; --gold:#D4A82F; --gold-dim:#8A6E22; --teal:#4FB0C6;
+    --text:#EDEEF0; --text-muted:#9FB0C3; --ink:#0A1628;
+    --line:rgba(159,176,195,0.18); --radius:2px;
+    --red:#E58B7B; --green:#7CD9A0; --yellow:#E3C468;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; line-height:1.6; min-height:100vh; }
+  h1,h2,h3,h4{ font-family:'Fraunces',serif; font-weight:600; line-height:1.15; letter-spacing:-0.01em; }
+  .mono{ font-family:'IBM Plex Mono',monospace; }
+  .wrap{ max-width:820px; margin:0 auto; padding:0 28px; }
+  @media(max-width:640px){ .wrap{ padding:0 18px; } }
+
+  header{
+    position:sticky; top:0; z-index:40;
+    background:rgba(10,22,40,0.9); backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  nav.wrap{ display:flex; align-items:center; justify-content:space-between; height:68px; max-width:960px;}
+  .brand{ display:flex; align-items:baseline; gap:10px; }
+  .brand-mark{ font-family:'Fraunces',serif; font-weight:700; font-size:1.2rem; }
+  .brand-sub{ font-family:'IBM Plex Mono',monospace; font-size:0.6rem; color:var(--text-muted); letter-spacing:0.08em; text-transform:uppercase; }
+  .btn{
+    display:inline-flex; align-items:center; gap:8px; padding:10px 18px;
+    font-family:'IBM Plex Mono',monospace; font-size:0.75rem; letter-spacing:0.02em;
+    border-radius:var(--radius); border:1px solid var(--line); cursor:pointer;
+    transition:all .2s ease; text-decoration:none; background:transparent; color:var(--text);
+  }
+  .btn-gold{ background:var(--gold); color:var(--ink); border-color:var(--gold); font-weight:600; }
+  .btn-gold:hover{ background:#e6bd44; }
+  .btn-gold:disabled{ opacity:0.35; cursor:not-allowed; }
+  .btn-ghost:hover{ border-color:var(--teal); color:var(--teal); }
+  .btn-whatsapp{ background:#1F3A2E; color:#8FE3A8; border-color:#2E5A44; }
+  .btn-whatsapp:hover{ background:#25452F; border-color:#4FB870; }
+  .btn-whatsapp svg{ width:14px; height:14px; }
+
+  .float-wa{
+    position:fixed; bottom:26px; right:26px; z-index:60;
+    width:56px; height:56px; border-radius:50%; background:#25D366;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 6px 20px rgba(0,0,0,0.35); transition:transform .18s ease; text-decoration:none;
+  }
+  .float-wa:hover{ transform:scale(1.07); }
+  .float-wa svg{ width:28px; height:28px; fill:#0A1628; }
+
+  /* ===== PROGRESS ===== */
+  .progress-shell{ padding:28px 0 8px; }
+  .progress-top{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px; }
+  .progress-label{ font-family:'IBM Plex Mono',monospace; font-size:0.72rem; color:var(--text-muted); letter-spacing:0.05em; }
+  .progress-track{ height:3px; background:var(--line); position:relative; overflow:hidden; }
+  .progress-fill{ height:100%; background:var(--teal); transition:width .3s ease; }
+  .block-chip{
+    display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:0.66rem;
+    color:var(--teal); border:1px solid rgba(79,176,198,0.35); padding:4px 10px;
+    letter-spacing:0.06em; text-transform:uppercase; margin-top:18px;
+  }
+
+  /* ===== QUESTION ===== */
+  main{ padding:36px 0 100px; }
+  .q-card{ padding:12px 0 0; }
+  .q-text{ font-size:1.18rem; margin:18px 0 30px; line-height:1.55; }
+  .q-text .katex-display{ margin:14px 0; }
+  .options{ display:flex; flex-direction:column; gap:10px; margin-bottom:36px; }
+  .option{
+    display:flex; align-items:flex-start; gap:14px;
+    padding:16px 18px; border:1px solid var(--line); border-radius:var(--radius);
+    cursor:pointer; transition:border-color .15s ease, background .15s ease;
+  }
+  .option:hover{ border-color:var(--teal); }
+  .option.selected{ border-color:var(--gold); background:rgba(212,168,47,0.06); }
+  .option-letter{
+    font-family:'IBM Plex Mono',monospace; font-size:0.78rem; font-weight:600;
+    width:24px; height:24px; border:1px solid var(--line); border-radius:50%;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    color:var(--text-muted);
+  }
+  .option.selected .option-letter{ border-color:var(--gold); color:var(--gold); }
+  .option-text{ font-size:0.96rem; padding-top:2px; }
+
+  .q-nav{ display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--line); padding-top:26px; }
+  .q-nav-right{ display:flex; gap:10px; }
+
+  /* ===== INTRO ===== */
+  .intro{ padding:60px 0 20px; }
+  .intro .eyebrow{ font-family:'IBM Plex Mono',monospace; font-size:0.72rem; letter-spacing:0.16em; text-transform:uppercase; color:var(--teal); display:flex; align-items:center; gap:10px; }
+  .intro .eyebrow::before{ content:""; width:22px; height:1px; background:var(--teal); display:inline-block; }
+  .intro h1{ font-size:clamp(1.9rem,4vw,2.6rem); margin:18px 0 20px; }
+  .intro p{ color:var(--text-muted); margin-bottom:16px; max-width:620px; }
+  .intro-meta{ display:flex; gap:28px; flex-wrap:wrap; margin:34px 0 40px; padding:24px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+  .meta-item .num{ font-family:'Fraunces',serif; font-size:1.5rem; color:var(--gold); font-weight:600; }
+  .meta-item .lbl{ font-family:'IBM Plex Mono',monospace; font-size:0.68rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-top:2px; }
+  .block-list{ display:grid; grid-template-columns:1fr 1fr; gap:8px 28px; margin-bottom:44px; }
+  @media(max-width:560px){ .block-list{ grid-template-columns:1fr; } }
+  .block-list li{ list-style:none; font-size:0.9rem; color:var(--text-muted); padding:9px 0; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; }
+  .block-list li b{ color:var(--text); font-weight:500; }
+
+  /* ===== RESULTS ===== */
+  .results{ padding:56px 0 100px; }
+  .score-hero{ text-align:center; padding:44px 0 40px; border-bottom:1px solid var(--line); margin-bottom:44px; }
+  .score-hero .eyebrow{ justify-content:center; }
+  .score-hero .eyebrow::before{ display:none; }
+  .score-big{ font-family:'Fraunces',serif; font-weight:700; font-size:5rem; margin:14px 0 6px; line-height:1; }
+  .score-band{ font-family:'IBM Plex Mono',monospace; font-size:0.95rem; letter-spacing:0.03em; padding:6px 16px; display:inline-block; border-radius:20px; margin-bottom:20px; }
+  .score-msg{ color:var(--text-muted); max-width:520px; margin:0 auto; }
+
+  .block-results{ display:flex; flex-direction:column; gap:1px; background:var(--line); border:1px solid var(--line); margin-bottom:48px; }
+  .block-row{ background:var(--bg); padding:20px 24px; display:flex; align-items:center; gap:18px; }
+  .block-dot{ width:11px; height:11px; border-radius:50%; flex-shrink:0; }
+  .block-row .binfo{ flex:1; }
+  .block-row h4{ font-size:1rem; margin-bottom:3px; }
+  .block-row .bsub{ font-family:'IBM Plex Mono',monospace; font-size:0.72rem; color:var(--text-muted); }
+  .block-row .bpct{ font-family:'IBM Plex Mono',monospace; font-size:1.1rem; font-weight:600; min-width:52px; text-align:right; }
+
+  .review-toggle{ text-align:center; margin-bottom:8px; }
+  .review-list{ display:none; flex-direction:column; gap:1px; background:var(--line); border:1px solid var(--line); margin-top:28px; }
+  .review-list.open{ display:flex; }
+  .review-item{ background:var(--bg-alt); padding:22px 24px; }
+  .review-item .rq{ font-size:0.95rem; margin-bottom:12px; }
+  .review-item .rstatus{ font-family:'IBM Plex Mono',monospace; font-size:0.7rem; letter-spacing:0.04em; text-transform:uppercase; margin-bottom:10px; display:inline-block; }
+  .rstatus.correct{ color:var(--green); }
+  .rstatus.wrong{ color:var(--red); }
+  .review-item .rjust{ font-size:0.86rem; color:var(--text-muted); border-left:2px solid var(--line); padding-left:14px; margin-top:10px; }
+
+  .results-actions{ display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin-top:48px; }
+
+  footer{ padding:36px 0; border-top:1px solid var(--line); text-align:center; }
+  footer .f-left{ font-family:'IBM Plex Mono',monospace; font-size:0.72rem; color:var(--text-muted); }
+
+  .hidden{ display:none !important; }
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="wrap">
+    <div class="brand">
+      <span class="brand-mark">Physics</span>
+      <span class="brand-sub">Evaluación diagnóstica</span>
+    </div>
+    <a href="https://wa.me/593995324419" target="_blank" rel="noopener" class="btn btn-whatsapp">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.44.79 3.06 1.2 4.72 1.2h.01c5.46 0 9.9-4.45 9.9-9.91C21.94 6.45 17.5 2 12.04 2zm5.8 14.16c-.24.68-1.4 1.3-1.93 1.38-.5.08-1.12.11-1.8-.11-.42-.14-.95-.3-1.64-.6-2.88-1.24-4.76-4.16-4.9-4.36-.14-.2-1.17-1.56-1.17-2.98s.73-2.11 1-2.4c.26-.29.57-.36.76-.36h.55c.18 0 .42-.02.65.5.24.55.82 1.9.9 2.04.07.14.12.3.02.49-.1.19-.15.3-.3.46-.14.16-.3.36-.43.48-.14.14-.29.28-.13.55.17.28.75 1.24 1.62 2.01 1.11.99 2.04 1.3 2.32 1.44.28.14.44.12.6-.07.17-.19.72-.84.91-1.13.19-.28.38-.24.63-.14.26.09 1.62.77 1.9.9.28.14.46.2.53.32.07.12.07.66-.17 1.34z"/></svg>
+      Ayuda
+    </a>
+  </nav>
+</header>
+
+<a href="https://wa.me/593995324419" target="_blank" rel="noopener" class="float-wa" aria-label="Contactar por WhatsApp">
+  <svg viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.44.79 3.06 1.2 4.72 1.2h.01c5.46 0 9.9-4.45 9.9-9.91C21.94 6.45 17.5 2 12.04 2zm5.8 14.16c-.24.68-1.4 1.3-1.93 1.38-.5.08-1.12.11-1.8-.11-.42-.14-.95-.3-1.64-.6-2.88-1.24-4.76-4.16-4.9-4.36-.14-.2-1.17-1.56-1.17-2.98s.73-2.11 1-2.4c.26-.29.57-.36.76-.36h.55c.18 0 .42-.02.65.5.24.55.82 1.9.9 2.04.07.14.12.3.02.49-.1.19-.15.3-.3.46-.14.16-.3.36-.43.48-.14.14-.29.28-.13.55.17.28.75 1.24 1.62 2.01 1.11.99 2.04 1.3 2.32 1.44.28.14.44.12.6-.07.17-.19.72-.84.91-1.13.19-.28.38-.24.63-.14.26.09 1.62.77 1.9.9.28.14.46.2.53.32.07.12.07.66-.17 1.34z"/></svg>
+</a>
+
+<!-- ===== INTRO SCREEN ===== -->
+<div id="screen-intro" class="wrap intro">
+  <div class="eyebrow">Antes de empezar</div>
+  <h1>Evaluación de conocimientos previos</h1>
+  <p>Esta prueba mide tu dominio actual de los prerrequisitos matemáticos de Ecuaciones Diferenciales Ordinarias: álgebra, funciones, límites, derivadas, integrales y números complejos. Es de nivel medio-alto, acorde al estándar de la ESPE.</p>
+  <p>No necesitas repasar antes de tomarla — su objetivo es diagnosticar tu punto de partida real, no evaluar si estudiaste. Al finalizar verás tu calificación y qué temas te conviene reforzar antes de la primera clase.</p>
+
+  <div class="intro-meta">
+    <div class="meta-item"><div class="num">24</div><div class="lbl">Preguntas</div></div>
+    <div class="meta-item"><div class="num">6</div><div class="lbl">Bloques temáticos</div></div>
+    <div class="meta-item"><div class="num">~50</div><div class="lbl">Minutos sugeridos</div></div>
+    <div class="meta-item"><div class="num">1</div><div class="lbl">Intento (puedes repetirla luego)</div></div>
+  </div>
+
+  <ul class="block-list" id="intro-block-list"></ul>
+
+  <button class="btn btn-gold" id="btn-start" style="padding:14px 30px;">Comenzar evaluación</button>
+</div>
+
+<!-- ===== QUESTION SCREEN ===== -->
+<div id="screen-quiz" class="hidden">
+  <div class="progress-shell wrap">
+    <div class="progress-top">
+      <span class="progress-label">Pregunta <span id="q-current">1</span> / 24</span>
+      <span class="progress-label" id="q-answered-count">0 respondidas</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:4.16%"></div></div>
+    <span class="block-chip" id="q-block-chip">Bloque 1 — Álgebra</span>
+  </div>
+
+  <main class="wrap">
+    <div class="q-card">
+      <div class="q-text" id="q-text"></div>
+      <div class="options" id="q-options"></div>
+      <div class="q-nav">
+        <button class="btn btn-ghost" id="btn-prev">← Anterior</button>
+        <div class="q-nav-right">
+          <button class="btn btn-gold" id="btn-next">Siguiente →</button>
+          <button class="btn btn-gold hidden" id="btn-finish">Finalizar evaluación</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ===== RESULTS SCREEN ===== -->
+<div id="screen-results" class="hidden wrap results">
+  <div class="score-hero">
+    <div class="eyebrow">Resultado</div>
+    <div class="score-big" id="score-big">0<span style="font-size:2.2rem; color:var(--text-muted);">/100</span></div>
+    <div class="score-band mono" id="score-band">—</div>
+    <p class="score-msg" id="score-msg"></p>
+  </div>
+
+  <h3 style="margin-bottom:20px; font-size:1.15rem;">Desglose por bloque</h3>
+  <div class="block-results" id="block-results"></div>
+
+  <div class="review-toggle">
+    <button class="btn btn-ghost" id="btn-review">Ver revisión detallada de respuestas</button>
+  </div>
+  <div class="review-list" id="review-list"></div>
+
+  <div class="results-actions">
+    <a href="https://wa.me/593995324419" target="_blank" rel="noopener" class="btn btn-whatsapp">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.44.79 3.06 1.2 4.72 1.2h.01c5.46 0 9.9-4.45 9.9-9.91C21.94 6.45 17.5 2 12.04 2zm5.8 14.16c-.24.68-1.4 1.3-1.93 1.38-.5.08-1.12.11-1.8-.11-.42-.14-.95-.3-1.64-.6-2.88-1.24-4.76-4.16-4.9-4.36-.14-.2-1.17-1.56-1.17-2.98s.73-2.11 1-2.4c.26-.29.57-.36.76-.36h.55c.18 0 .42-.02.65.5.24.55.82 1.9.9 2.04.07.14.12.3.02.49-.1.19-.15.3-.3.46-.14.16-.3.36-.43.48-.14.14-.29.28-.13.55.17.28.75 1.24 1.62 2.01 1.11.99 2.04 1.3 2.32 1.44.28.14.44.12.6-.07.17-.19.72-.84.91-1.13.19-.28.38-.24.63-.14.26.09 1.62.77 1.9.9.28.14.46.2.53.32.07.12.07.66-.17 1.34z"/></svg>
+      Asesoría personalizada de Physics
+    </a>
+    <a href="contenido.html" class="btn btn-gold" style="padding:12px 26px;">Continuar a los temas del curso →</a>
+    <button class="btn btn-ghost" id="btn-retry">Repetir evaluación</button>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap"><div class="f-left mono">Physics · Centro de Educación Continua — EDO A0401 · ESPE</div></div>
+</footer>
+
+<script>
+/* ========================================================
+   GATE: exige acceso válido desde index.html
+======================================================== */
+if(sessionStorage.getItem('physics_access') !== 'granted'){
+  window.location.href = 'index.html#acceso';
+}
+
+/* ========================================================
+   BANCO DE PREGUNTAS
+======================================================== */
+const BLOCKS = [
+  {id:1, name:"Álgebra y Precálculo"},
+  {id:2, name:"Funciones"},
+  {id:3, name:"Límites y Continuidad"},
+  {id:4, name:"Derivadas"},
+  {id:5, name:"Integrales"},
+  {id:6, name:"Complejos y Trigonometría"}
+];
+
+const QUESTIONS = [
+  // ---- BLOQUE 1 ----
+  {block:1, text:"¿Cuál es la descomposición en fracciones parciales de la siguiente expresión? $$\\dfrac{3x^2 - 4x + 5}{(x-1)^2(x+2)}$$",
+   options:["$\\dfrac{A}{x-1} + \\dfrac{B}{(x-1)^2} + \\dfrac{C}{x+2}$","$\\dfrac{A}{x-1} + \\dfrac{B}{x+2}$ únicamente","$\\dfrac{Ax+B}{(x-1)^2} + \\dfrac{C}{x+2}$","$\\dfrac{A}{(x-1)^2} + \\dfrac{B}{(x+2)^2}$"],
+   correct:0, just:"Un factor lineal repetido (x-1)² exige dos términos con potencias crecientes del denominador; el factor simple (x+2) exige un solo término."},
+  {block:1, text:"¿Cuáles son todas las raíces reales del polinomio $x^3 - 4x^2 + x + 6$?",
+   options:["$x = -1, 2, 3$","$x = 1, -2, 3$","$x = -1, -2, -3$","$x = 1, 2, -3$"],
+   correct:0, just:"x=-1 anula el polinomio; dividiendo por (x+1) queda x²-5x+6, que factoriza como (x-2)(x-3)."},
+  {block:1, text:"Resuelve para x: $\\ln(x) + \\ln(x-3) = \\ln(10)$",
+   options:["$x = 5$ (se descarta la otra solución por dominio)","$x = 5$ y $x = -2$","$x = -2$","$x = 2$"],
+   correct:0, just:"x²-3x-10=0 da x=5 o x=-2, pero ln(x-3) exige x>3, así que se descarta x=-2."},
+  {block:1, text:"Determina los valores de A y B: $$2A - B = 5$$ $$A + 3B = -4$$",
+   options:["$A = 11/7,\\ B = -17/7$","$A = 2,\\ B = -2$","$A = -1,\\ B = -1$","$A = 1,\\ B = -2$"],
+   correct:0, just:"De la primera ecuación B=2A-5; sustituyendo: A+3(2A-5)=-4 → 7A=11 → A=11/7, B=-17/7."},
+
+  // ---- BLOQUE 2 ----
+  {block:2, text:"¿Cuál es el dominio de $f(x) = \\sqrt{\\ln(4-x)}$?",
+   options:["$(-\\infty, 3]$","$(-\\infty, 4)$","$[3, 4)$","$(3, 4]$"],
+   correct:2, just:"Se necesita 4-x>0 (x<4) y ln(4-x)≥0 (x≤3) simultáneamente. Intersección: [3,4)."},
+  {block:2, text:"Halla la inversa de $f(x) = \\dfrac{2x+1}{x-3}$",
+   options:["$f^{-1}(x) = \\dfrac{3x+1}{x-2}$","$f^{-1}(x) = \\dfrac{x-3}{2x+1}$","$f^{-1}(x) = \\dfrac{3x-1}{x+2}$","$f^{-1}(x) = \\dfrac{2x-1}{x+3}$"],
+   correct:0, just:"Intercambiando x↔y y despejando: y(x-2)=3x+1 → y=(3x+1)/(x-2)."},
+  {block:2, text:"Dada $f(x) = x^2+1$ si $x<2$, y $f(x)=kx-1$ si $x\\geq2$. ¿Qué valor de k hace f continua en x=2?",
+   options:["$k = 3$","$k = 2$","$k = 5/2$","$k = 4$"],
+   correct:0, just:"Límite por izquierda en x=2: 2²+1=5. Igualando: 2k-1=5 → k=3."},
+  {block:2, text:"Una población sigue $P(t)=P_0e^{kt}$ y se duplica cada 5 horas. ¿Cuál es k (redondeado a 4 decimales)?",
+   options:["$k \\approx 0.1386$","$k \\approx 0.2000$","$k \\approx 0.6931$","$k \\approx 0.0693$"],
+   correct:0, just:"2P₀=P₀e^(5k) → ln(2)=5k → k=ln(2)/5 ≈ 0.1386."},
+
+  // ---- BLOQUE 3 ----
+  {block:3, text:"Calcula: $\\displaystyle\\lim_{x\\to 0} \\dfrac{e^{2x} - 1 - 2x}{x^2}$",
+   options:["$1$","$2$","$0$","$\\infty$ (diverge)"],
+   correct:1, just:"Es 0/0; aplicando L'Hôpital dos veces se obtiene el límite 2."},
+  {block:3, text:"Calcula: $\\displaystyle\\lim_{x\\to\\infty} \\dfrac{3x^2 - 5x}{\\sqrt{4x^4 + 1}}$",
+   options:["$3/2$","$3/4$","$0$","$\\infty$"],
+   correct:0, just:"Dividiendo por x²: (3-5/x)/√(4+1/x⁴) → 3/2 cuando x→∞."},
+  {block:3, text:"Clasifica la discontinuidad de $f(x) = \\dfrac{x^2 - 9}{x-3}$ en $x=3$",
+   options:["Evitable (removible)","De salto","Infinita (asintótica)","f es continua en x=3"],
+   correct:0, just:"f(x)=x+3 para x≠3, con un hueco en x=3: el límite existe (=6) pero la función no está definida ahí."},
+  {block:3, text:"¿Existe $\\displaystyle\\lim_{x\\to 1} f(x)$ si $f(x)=3x-1$ para $x<1$ y $f(x)=x^2+1$ para $x\\geq1$?",
+   options:["Sí, el límite es 2","Sí, el límite es 3","No existe (límites laterales distintos)","No existe (la función no está definida en x=1)"],
+   correct:0, just:"Límite por izquierda: 3(1)-1=2. Límite por derecha: 1²+1=2. Ambos coinciden."},
+
+  // ---- BLOQUE 4 ----
+  {block:4, text:"Deriva: $f(x) = \\sin\\!\\big(\\ln(x^2+1)\\big)$",
+   options:["$\\cos\\!\\big(\\ln(x^2+1)\\big) \\cdot \\dfrac{2x}{x^2+1}$","$\\cos(x^2+1) \\cdot \\dfrac{2x}{x^2+1}$","$\\dfrac{2x}{x^2+1}$","$\\cos\\!\\big(\\ln(x^2+1)\\big) \\cdot \\dfrac{1}{x^2+1}$"],
+   correct:0, just:"Tres capas de regla de la cadena: derivada del seno externo, del logaritmo, y del argumento interno (2x)."},
+  {block:4, text:"Si $x^2y + y^3 = 4x$, determina $dy/dx$",
+   options:["$\\dfrac{4 - 2xy}{x^2+3y^2}$","$\\dfrac{4}{2x+3y^2}$","$\\dfrac{4-2xy}{2x+3y}$","$4 - 2xy - 3y^2$"],
+   correct:0, just:"Derivando implícitamente: 2xy+x²y'+3y²y'=4 → y'(x²+3y²)=4-2xy → y'=(4-2xy)/(x²+3y²)."},
+  {block:4, text:"Calcula la tercera derivada de $f(x) = x^4 - 3x^3 + 2x$",
+   options:["$24x - 18$","$12x^2 - 18x$","$24x$","$24$"],
+   correct:0, just:"f'=4x³-9x²+2; f''=12x²-18x; f'''=24x-18."},
+  {block:4, text:"Deriva: $f(x) = e^{3x}\\cos(2x)$",
+   options:["$e^{3x}\\big(3\\cos(2x) - 2\\sin(2x)\\big)$","$3e^{3x}\\cos(2x)$","$-2e^{3x}\\sin(2x)$","$e^{3x}\\big(3\\cos(2x) + 2\\sin(2x)\\big)$"],
+   correct:0, just:"Regla del producto: 3e^(3x)cos(2x) + e^(3x)(-2sin(2x)) = e^(3x)(3cos2x-2sin2x)."},
+
+  // ---- BLOQUE 5 ----
+  {block:5, text:"Calcula: $\\displaystyle\\int e^{x}\\cos(x)\\,dx$",
+   options:["$\\dfrac{e^{x}(\\sin x + \\cos x)}{2} + C$","$e^{x}\\sin(x) + C$","$e^{x}(\\sin x - \\cos x) + C$","$\\dfrac{e^{x}(\\sin x - \\cos x)}{2} + C$"],
+   correct:0, just:"Integración por partes cíclica: se aplica dos veces y se despeja la integral original."},
+  {block:5, text:"Calcula: $\\displaystyle\\int \\dfrac{dx}{\\sqrt{9 - x^2}}$",
+   options:["$\\arcsin\\!\\left(\\dfrac{x}{3}\\right) + C$","$\\arctan\\!\\left(\\dfrac{x}{3}\\right) + C$","$\\dfrac{1}{3}\\arcsin\\!\\left(\\dfrac{x}{3}\\right) + C$","$\\ln|x+\\sqrt{9-x^2}| + C$"],
+   correct:0, just:"Sustitución trigonométrica x=3sinθ; forma estándar ∫dx/√(a²-x²) = arcsin(x/a)+C."},
+  {block:5, text:"Calcula: $\\displaystyle\\int \\dfrac{5x-3}{x^2-x-2}\\,dx$",
+   options:["$\\dfrac{7}{3}\\ln|x-2| + \\dfrac{8}{3}\\ln|x+1| + C$","$5\\ln|x-2| - 3\\ln|x+1| + C$","$\\ln|x^2-x-2| + C$","$\\dfrac{7}{3}\\ln|x+1| + \\dfrac{8}{3}\\ln|x-2| + C$"],
+   correct:0, just:"Factorizando x²-x-2=(x-2)(x+1), fracciones parciales dan 7/3/(x-2) + 8/3/(x+1)."},
+  {block:5, text:"¿La integral impropia $\\displaystyle\\int_{1}^{\\infty} \\dfrac{1}{x^{2}}\\,dx$ converge o diverge?",
+   options:["Converge, y su valor es 1","Diverge","Converge, y su valor es 0","Converge, y su valor es 1/2"],
+   correct:0, just:"∫₁^∞ x⁻²dx = lim(b→∞)[-1/x]₁^b = lim(-1/b+1) = 1."},
+
+  // ---- BLOQUE 6 ----
+  {block:6, text:"Si $z_1 = 2\\,\\text{cis}(30°)$ y $z_2 = 4\\,\\text{cis}(60°)$, calcula $z_1 \\cdot z_2$ en forma polar",
+   options:["$8\\,\\text{cis}(90°)$","$6\\,\\text{cis}(90°)$","$8\\,\\text{cis}(30°)$","$8\\,\\text{cis}(1800°)$"],
+   correct:0, just:"Al multiplicar complejos en forma polar, los módulos se multiplican (2×4=8) y los argumentos se suman (30°+60°=90°)."},
+  {block:6, text:"Usando la fórmula de Euler, ¿cuál es el valor de $e^{i\\pi} + 1$?",
+   options:["$0$","$2$","$i$","$-1$"],
+   correct:0, just:"e^(iπ)=cos π + i sin π = -1. Entonces e^(iπ)+1 = 0 (identidad de Euler)."},
+  {block:6, text:"Simplifica: $\\sin(2x) \\cdot \\cos(x) - \\cos(2x)\\cdot\\sin(x)$",
+   options:["$\\sin(x)$","$\\sin(3x)$","$\\cos(x)$","$\\sin(x)\\cos(2x)$"],
+   correct:0, just:"Tiene la forma sin(A)cos(B)-cos(A)sin(B)=sin(A-B) con A=2x, B=x, resultando sin(x)."},
+  {block:6, text:"Resuelve $2\\sin^2(x) - \\sin(x) - 1 = 0$ para $x \\in [0, 2\\pi)$",
+   options:["$x = \\pi/2,\\ 7\\pi/6,\\ 11\\pi/6$","$x = \\pi/2,\\ \\pi/6,\\ 5\\pi/6$","$x = \\pi/2$ únicamente","$x = 3\\pi/2,\\ \\pi/6,\\ 5\\pi/6$"],
+   correct:0, just:"Sea u=sin(x): 2u²-u-1=0 → (2u+1)(u-1)=0 → u=1 (x=π/2) o u=-1/2 (x=7π/6, 11π/6)."}
+];
+
+/* ========================================================
+   ESTADO
+======================================================== */
+let current = 0;
+const answers = new Array(QUESTIONS.length).fill(null);
+
+/* ========================================================
+   RENDER: intro block list
+======================================================== */
+function renderIntroBlocks(){
+  const ul = document.getElementById('intro-block-list');
+  ul.innerHTML = BLOCKS.map(b => {
+    const count = QUESTIONS.filter(q => q.block === b.id).length;
+    return `<li><span>${b.id}. ${b.name}</span><b>${count} preguntas</b></li>`;
+  }).join('');
+}
+renderIntroBlocks();
+
+/* ========================================================
+   RENDER MATH
+======================================================== */
+function renderMath(container){
+  if(window.renderMathInElement){
+    renderMathInElement(container, {
+      delimiters: [
+        {left: "$$", right: "$$", display: true},
+        {left: "$", right: "$", display: false}
+      ]
+    });
+  }
+}
+
+/* ========================================================
+   QUIZ NAVIGATION
+======================================================== */
+function renderQuestion(){
+  const q = QUESTIONS[current];
+  const blockInfo = BLOCKS.find(b => b.id === q.block);
+
+  document.getElementById('q-current').textContent = current + 1;
+  document.getElementById('progress-fill').style.width = ((current+1)/QUESTIONS.length*100) + '%';
+  document.getElementById('q-block-chip').textContent = `Bloque ${q.block} — ${blockInfo.name}`;
+  document.getElementById('q-answered-count').textContent = answers.filter(a => a !== null).length + ' respondidas';
+
+  document.getElementById('q-text').innerHTML = q.text;
+
+  const optsWrap = document.getElementById('q-options');
+  optsWrap.innerHTML = q.options.map((opt, i) => {
+    const letter = String.fromCharCode(65 + i);
+    const selected = answers[current] === i ? 'selected' : '';
+    return `<div class="option ${selected}" data-idx="${i}">
+      <span class="option-letter">${letter}</span>
+      <span class="option-text">${opt}</span>
+    </div>`;
+  }).join('');
+
+  document.querySelectorAll('.option').forEach(el => {
+    el.addEventListener('click', () => {
+      answers[current] = parseInt(el.dataset.idx);
+      renderQuestion();
+    });
+  });
+
+  document.getElementById('btn-prev').style.visibility = current === 0 ? 'hidden' : 'visible';
+  const isLast = current === QUESTIONS.length - 1;
+  document.getElementById('btn-next').classList.toggle('hidden', isLast);
+  document.getElementById('btn-finish').classList.toggle('hidden', !isLast);
+
+  renderMath(document.getElementById('q-card') || document.getElementById('screen-quiz'));
+}
+
+document.getElementById('btn-start').addEventListener('click', () => {
+  document.getElementById('screen-intro').classList.add('hidden');
+  document.getElementById('screen-quiz').classList.remove('hidden');
+  renderQuestion();
+});
+
+document.getElementById('btn-next').addEventListener('click', () => {
+  if(current < QUESTIONS.length - 1){ current++; renderQuestion(); window.scrollTo({top:0,behavior:'smooth'}); }
+});
+document.getElementById('btn-prev').addEventListener('click', () => {
+  if(current > 0){ current--; renderQuestion(); window.scrollTo({top:0,behavior:'smooth'}); }
+});
+document.getElementById('btn-finish').addEventListener('click', () => {
+  const unanswered = answers.filter(a => a === null).length;
+  if(unanswered > 0){
+    const proceed = confirm(`Tienes ${unanswered} pregunta(s) sin responder. ¿Deseas finalizar de todas formas? Las preguntas sin responder cuentan como incorrectas.`);
+    if(!proceed) return;
+  }
+  showResults();
+});
+
+/* ========================================================
+   RESULTADOS
+======================================================== */
+function showResults(){
+  document.getElementById('screen-quiz').classList.add('hidden');
+  document.getElementById('screen-intro').classList.add('hidden');
+  const resultsEl = document.getElementById('screen-results');
+  resultsEl.classList.remove('hidden');
+
+  let correctCount = 0;
+  const blockStats = {};
+  BLOCKS.forEach(b => blockStats[b.id] = {correct:0, total:0});
+
+  QUESTIONS.forEach((q, i) => {
+    blockStats[q.block].total++;
+    if(answers[i] === q.correct){
+      correctCount++;
+      blockStats[q.block].correct++;
+    }
+  });
+
+  const scorePct = Math.round((correctCount / QUESTIONS.length) * 100);
+  document.getElementById('score-big').innerHTML = scorePct + '<span style="font-size:2.2rem; color:var(--text-muted);">/100</span>';
+
+  let band, bandColor, msg;
+  if(scorePct >= 85){
+    band = "Excelente base"; bandColor = "var(--green)";
+    msg = "Tu base es sólida. Estás listo para EDO sin repaso adicional. Aun así, revisa los bloques que no llegaron al 100% para llegar afinado a la primera clase.";
+  } else if(scorePct >= 65){
+    band = "Base aceptable, con vacíos puntuales"; bandColor = "var(--yellow)";
+    msg = "Tienes buena base general, pero hay bloques específicos que conviene reforzar antes de la primera semana de clases. Revisa el desglose abajo.";
+  } else if(scorePct >= 45){
+    band = "Base débil — repaso necesario"; bandColor = "var(--red)";
+    msg = "Detectamos vacíos importantes en varios bloques. Te recomendamos repasar los temas marcados antes de iniciar, o escribirnos por WhatsApp para orientarte.";
+  } else {
+    band = "Base insuficiente"; bandColor = "var(--red)";
+    msg = "Tu preparación actual dificultará seguir el ritmo del curso. Te sugerimos un repaso intensivo de precálculo/cálculo antes de comenzar. Contáctanos por WhatsApp para una asesoría personalizada.";
+  }
+
+  document.getElementById('score-band').textContent = band;
+  document.getElementById('score-band').style.color = bandColor;
+  document.getElementById('score-band').style.border = `1px solid ${bandColor}`;
+  document.getElementById('score-msg').textContent = msg;
+
+  const blockResultsEl = document.getElementById('block-results');
+  blockResultsEl.innerHTML = BLOCKS.map(b => {
+    const stat = blockStats[b.id];
+    const pct = Math.round((stat.correct/stat.total)*100);
+    let dotColor, statusLabel;
+    if(pct >= 75){ dotColor = 'var(--green)'; statusLabel = 'Dominado'; }
+    else if(pct >= 50){ dotColor = 'var(--yellow)'; statusLabel = 'Reforzar'; }
+    else { dotColor = 'var(--red)'; statusLabel = 'Prioridad de repaso'; }
+    return `<div class="block-row">
+      <div class="block-dot" style="background:${dotColor}"></div>
+      <div class="binfo">
+        <h4>${b.id}. ${b.name}</h4>
+        <div class="bsub">${stat.correct}/${stat.total} correctas · ${statusLabel}</div>
+      </div>
+      <div class="bpct" style="color:${dotColor}">${pct}%</div>
+    </div>`;
+  }).join('');
+
+  const reviewList = document.getElementById('review-list');
+  reviewList.innerHTML = QUESTIONS.map((q, i) => {
+    const isCorrect = answers[i] === q.correct;
+    const userAns = answers[i] === null ? "Sin responder" : q.options[answers[i]];
+    return `<div class="review-item">
+      <span class="rstatus ${isCorrect ? 'correct' : 'wrong'}">${isCorrect ? '✓ Correcta' : '✗ Incorrecta'} — Bloque ${q.block}</span>
+      <div class="rq">${i+1}. ${q.text}</div>
+      <div style="font-size:0.86rem; color:var(--text-muted);">Tu respuesta: ${userAns}</div>
+      ${!isCorrect ? `<div style="font-size:0.86rem; color:var(--text-muted);">Respuesta correcta: ${q.options[q.correct]}</div>` : ''}
+      <div class="rjust">${q.just}</div>
+    </div>`;
+  }).join('');
+  renderMath(reviewList);
+
+  sessionStorage.setItem('physics_diagnostic_score', scorePct);
+}
+
+document.getElementById('btn-review').addEventListener('click', () => {
+  const list = document.getElementById('review-list');
+  list.classList.toggle('open');
+  document.getElementById('btn-review').textContent = list.classList.contains('open')
+    ? 'Ocultar revisión detallada' : 'Ver revisión detallada de respuestas';
+});
+
+document.getElementById('btn-retry').addEventListener('click', () => {
+  answers.fill(null);
+  current = 0;
+  document.getElementById('screen-results').classList.add('hidden');
+  document.getElementById('screen-intro').classList.remove('hidden');
+  window.scrollTo({top:0});
+});
+</script>
+
+</body>
+</html>
