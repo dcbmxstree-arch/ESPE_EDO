@@ -57,7 +57,6 @@
   .float-wa:hover{ transform:scale(1.07); }
   .float-wa svg{ width:28px; height:28px; fill:#0A1628; }
 
-  /* ===== PROGRESS ===== */
   .progress-shell{ padding:28px 0 8px; }
   .progress-top{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px; }
   .progress-label{ font-family:'IBM Plex Mono',monospace; font-size:0.72rem; color:var(--text-muted); letter-spacing:0.05em; }
@@ -69,7 +68,6 @@
     letter-spacing:0.06em; text-transform:uppercase; margin-top:18px;
   }
 
-  /* ===== QUESTION ===== */
   main{ padding:36px 0 100px; }
   .q-card{ padding:12px 0 0; }
   .q-text{ font-size:1.18rem; margin:18px 0 30px; line-height:1.55; }
@@ -94,7 +92,6 @@
   .q-nav{ display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--line); padding-top:26px; }
   .q-nav-right{ display:flex; gap:10px; }
 
-  /* ===== INTRO ===== */
   .intro{ padding:60px 0 20px; }
   .intro .eyebrow{ font-family:'IBM Plex Mono',monospace; font-size:0.72rem; letter-spacing:0.16em; text-transform:uppercase; color:var(--teal); display:flex; align-items:center; gap:10px; }
   .intro .eyebrow::before{ content:""; width:22px; height:1px; background:var(--teal); display:inline-block; }
@@ -108,7 +105,6 @@
   .block-list li{ list-style:none; font-size:0.9rem; color:var(--text-muted); padding:9px 0; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; }
   .block-list li b{ color:var(--text); font-weight:500; }
 
-  /* ===== RESULTS ===== */
   .results{ padding:56px 0 100px; }
   .score-hero{ text-align:center; padding:44px 0 40px; border-bottom:1px solid var(--line); margin-bottom:44px; }
   .score-hero .eyebrow{ justify-content:center; }
@@ -276,7 +272,7 @@ const QUESTIONS = [
   // ---- BLOQUE 2 ----
   {block:2, text:"¿Cuál es el dominio de $f(x) = \\sqrt{\\ln(4-x)}$?",
    options:["$(-\\infty, 3]$","$(-\\infty, 4)$","$[3, 4)$","$(3, 4]$"],
-   correct:2, just:"Se necesita 4-x>0 (x<4) y ln(4-x)≥0 (x≤3) simultáneamente. Intersección: [3,4)."},
+   correct:0, just:"Se necesita 4-x>0 (x<4) y ln(4-x)≥0 (x≤3) simultáneamente. Intersección: [3,4)."},
   {block:2, text:"Halla la inversa de $f(x) = \\dfrac{2x+1}{x-3}$",
    options:["$f^{-1}(x) = \\dfrac{3x+1}{x-2}$","$f^{-1}(x) = \\dfrac{x-3}{2x+1}$","$f^{-1}(x) = \\dfrac{3x-1}{x+2}$","$f^{-1}(x) = \\dfrac{2x-1}{x+3}$"],
    correct:0, just:"Intercambiando x↔y y despejando: y(x-2)=3x+1 → y=(3x+1)/(x-2)."},
@@ -343,6 +339,29 @@ const QUESTIONS = [
    options:["$x = \\pi/2,\\ 7\\pi/6,\\ 11\\pi/6$","$x = \\pi/2,\\ \\pi/6,\\ 5\\pi/6$","$x = \\pi/2$ únicamente","$x = 3\\pi/2,\\ \\pi/6,\\ 5\\pi/6$"],
    correct:0, just:"Sea u=sin(x): 2u²-u-1=0 → (2u+1)(u-1)=0 → u=1 (x=π/2) o u=-1/2 (x=7π/6, 11π/6)."}
 ];
+
+// -------------------------------------------------------
+// REORDENAR OPCIONES PARA QUE LA CORRECTA NO SIEMPRE ESTÉ EN LA PRIMERA
+// -------------------------------------------------------
+function reorderOptions() {
+  QUESTIONS.forEach((q, idx) => {
+    const n = q.options.length;
+    // Desplazamiento entre 1 y 3 (nunca 0) para que la correcta cambie de posición
+    const shift = (idx + 1) % 4;  // 1,2,3,0,1,2,3,0...
+    if (shift === 0) return;     // si es 0, no se mueve, pero raramente ocurre
+
+    // Rotar el array de opciones a la izquierda 'shift' veces
+    const rotated = q.options.slice(shift).concat(q.options.slice(0, shift));
+    q.options = rotated;
+
+    // Ajustar el índice correcto: la opción que estaba en la posición original 'correct'
+    // ahora está en (correct - shift + n) % n
+    q.correct = (q.correct - shift + n) % n;
+  });
+}
+
+// Ejecutar al cargar la página (una sola vez)
+reorderOptions();
 
 /* ========================================================
    ESTADO
